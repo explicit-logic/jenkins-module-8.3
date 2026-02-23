@@ -1,5 +1,13 @@
 #!/user/bin/env groovy
-@Library('jenkins-shared-library')
+
+// If the shared library is configured globally in Jenkins
+// @Library('jenkins-shared-library')
+
+library identifier: 'jenkins-shared-library@main', retriever: modernSCM([
+  $class: 'GitSCMSource',
+  remote: 'https://github.com/explicit-logic/jenkins-shared-library',
+  credentialsId: 'github'
+])
 
 def gv
 

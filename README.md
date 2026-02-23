@@ -46,12 +46,12 @@ Credentials: `github`
 
 Click **Save**.
 
-### Integrate and use the JSL in Jenkins Pipeline (globally and for a specific project in Jenkinsfile)
+### Integrate and use the JSL in Jenkins Pipeline globally
 
 1. Create a `Multibranch Pipeline` Jenkins Job
 
 - From the dashboard, click **New Item**
-- Name: `microservice-user-auth`
+- Name: `shared-pipeline`
 - Type: **Multibranch Pipeline**
 - Click **OK**
 
@@ -74,3 +74,24 @@ Click **Build with Parameters** and fill in:
 |-----------|-------|
 | `DOCKER_IMAGE` | `<docker_username>/app` |
 
+
+![JSL in Jenkins Pipeline globally](./images/jenkins-shared-global.gif)
+
+
+### Integrate and use the JSL in Jenkins Pipeline for a specific project in Jenkinsfile
+
+- Navigate to `Manage Jenkins` -> System -> Global Trusted Pipeline Libraries
+
+- Remove `jenkins-shared-library`
+
+- Add the following code to `Jenkinsfile` insead of `@Library('jenkins-shared-library')`:
+
+```groovy
+library identifier: 'jenkins-shared-library@main', retriever: modernSCM([
+  $class: 'GitSCMSource',
+  remote: 'https://github.com/explicit-logic/jenkins-shared-library',
+  credentialsId: 'github'
+])
+```
+
+- Run the job
