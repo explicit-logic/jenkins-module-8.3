@@ -18,7 +18,7 @@ Create a Jenkins Shared Library to extract common build logic:
 
 ---
 
-1. Create separate Git repository for Jenkins Shared Library project
+### Create separate Git repository for Jenkins Shared Library project
 
 Name: `jenkins-shared-library`
 
@@ -26,7 +26,7 @@ Name: `jenkins-shared-library`
 
 Repository URL: `https://github.com/explicit-logic/jenkins-shared-library`
 
-2. Make Shared Library available globally
+### Make Shared Library available globally
 
 - Navigate to `Manage Jenkins` -> System -> Global Trusted Pipeline Libraries
 
@@ -46,4 +46,31 @@ Credentials: `github`
 
 Click **Save**.
 
+### Integrate and use the JSL in Jenkins Pipeline (globally and for a specific project in Jenkinsfile)
+
+1. Create a `Multibranch Pipeline` Jenkins Job
+
+- From the dashboard, click **New Item**
+- Name: `microservice-user-auth`
+- Type: **Multibranch Pipeline**
+- Click **OK**
+
+2. Configure Branch Sources
+
+Under **Branch Sources**, click **Add source** > **Git** and fill in:
+
+| Field | Value |
+|-------|-------|
+| Project Repository | `https://github.com/explicit-logic/jenkins-module-8.3` |
+| Credentials | `github` |
+
+Click **Save**. Jenkins will automatically scan the repository and create jobs for branches that contain a `Jenkinsfile`.
+
+3. Run the job
+
+Click **Build with Parameters** and fill in:
+
+| Parameter | Value |
+|-----------|-------|
+| `DOCKER_IMAGE` | `<docker_username>/app` |
 

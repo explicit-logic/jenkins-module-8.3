@@ -9,7 +9,7 @@ pipeline {
     maven 'maven-3.9'
   }
   parameters {
-    string(name: 'DOCKER_REPO', defaultValue: 'explicitlogic/app')
+    string(name: 'DOCKER_IMAGE', defaultValue: 'explicitlogic/app')
   }
   stages {
     stage("init") {
@@ -47,11 +47,13 @@ pipeline {
       }
     }
 
-    stage("build image") {
+    stage("build and push image") {
       steps {
         dir('app') {
           script {
-            buildImage(params.DOCKER_REPO, env.BRANCH_NAME)
+            buildImage(params.DOCKER_IMAGE, env.BRANCH_NAME)
+            dockerLogin()
+            dockerPush(params.DOCKER_IMAGE, env.BRANCH_NAME)
           }
         }
       }
