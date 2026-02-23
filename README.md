@@ -18,73 +18,78 @@ Create a Jenkins Shared Library to extract common build logic:
 
 ---
 
-### Create separate Git repository for Jenkins Shared Library project
+### Step 1 — Create a Separate Git Repository for the Jenkins Shared Library
 
-Name: `jenkins-shared-library`
+Create a new Git repository to host the shared library code.
 
-![](./images/jenkins-shared-library.png)
+| Field | Value |
+|-------|-------|
+| Name | `jenkins-shared-library` |
+| Repository URL | `https://github.com/explicit-logic/jenkins-shared-library` |
 
-Repository URL: `https://github.com/explicit-logic/jenkins-shared-library`
+![Jenkins Shared Library repository](./images/jenkins-shared-library.png)
 
-### Make Shared Library available globally
+---
 
-- Navigate to `Manage Jenkins` -> System -> Global Trusted Pipeline Libraries
+### Step 2 — Make the Shared Library Available Globally
 
-- Click `Add`
+Register the library in Jenkins so all pipelines can reference it.
 
-Name: `jenkins-shared-library`
+1. Navigate to **Manage Jenkins** → **System** → **Global Trusted Pipeline Libraries**
+2. Click **Add** and fill in the following fields:
 
-Default version: `main`
+| Field | Value |
+|-------|-------|
+| Name | `jenkins-shared-library` |
+| Default version | `main` |
+| Retrieval method | `Modern SCM` |
+| Source Code Management | `Git` |
+| Project Repository | `https://github.com/explicit-logic/jenkins-shared-library` |
+| Credentials | `github` |
 
-Retrieval method: `Modern SCM`
+3. Click **Save**.
 
-Source Code Management: `Git`
+---
 
-Project Repository: `https://github.com/explicit-logic/jenkins-shared-library`
+### Step 3 — Integrate and Use the JSL in a Jenkins Pipeline Globally
 
-Credentials: `github`
+#### 3.1 Create a Multibranch Pipeline Job
 
-Click **Save**.
+1. From the Jenkins dashboard, click **New Item**
+2. Set **Name** to `shared-pipeline`
+3. Select **Multibranch Pipeline** as the type
+4. Click **OK**
 
-### Integrate and use the JSL in Jenkins Pipeline globally
+#### 3.2 Configure Branch Sources
 
-1. Create a `Multibranch Pipeline` Jenkins Job
-
-- From the dashboard, click **New Item**
-- Name: `shared-pipeline`
-- Type: **Multibranch Pipeline**
-- Click **OK**
-
-2. Configure Branch Sources
-
-Under **Branch Sources**, click **Add source** > **Git** and fill in:
+Under **Branch Sources**, click **Add source** → **Git** and fill in:
 
 | Field | Value |
 |-------|-------|
 | Project Repository | `https://github.com/explicit-logic/jenkins-module-8.3` |
 | Credentials | `github` |
 
-Click **Save**. Jenkins will automatically scan the repository and create jobs for branches that contain a `Jenkinsfile`.
+Click **Save**. Jenkins will automatically scan the repository and create jobs for every branch containing a `Jenkinsfile`.
 
-3. Run the job
+#### 3.3 Run the Job
 
-Click **Build with Parameters** and fill in:
+Click **Build with Parameters** and provide the following:
 
-| Parameter | Value |
-|-----------|-------|
+| Parameter | Example Value |
+|-----------|---------------|
 | `DOCKER_IMAGE` | `<docker_username>/app` |
-
 
 ![JSL in Jenkins Pipeline globally](./images/jenkins-shared-global.gif)
 
+---
 
-### Integrate and use the JSL in Jenkins Pipeline for a specific project in Jenkinsfile
+### Step 4 — Integrate the JSL for a Specific Project in the Jenkinsfile
 
-- Navigate to `Manage Jenkins` -> System -> Global Trusted Pipeline Libraries
+This approach embeds the library reference directly in the `Jenkinsfile`, removing the need for a global configuration. This is useful when you want the pipeline to be fully self-contained and portable.
 
-- Remove `jenkins-shared-library`
-
-- Add the following code to `Jenkinsfile` insead of `@Library('jenkins-shared-library')`:
+1. Navigate to **Manage Jenkins** → **System** → **Global Trusted Pipeline Libraries**
+2. **Remove** the `jenkins-shared-library` entry added in Step 2
+3. Open your `Jenkinsfile` and replace `@Library('jenkins-shared-library')` with the following block:
 
 ```groovy
 library identifier: 'jenkins-shared-library@main', retriever: modernSCM([
@@ -94,4 +99,6 @@ library identifier: 'jenkins-shared-library@main', retriever: modernSCM([
 ])
 ```
 
-- Run the job
+4. Commit the change and run the job again
+
+![JSL in Jenkins Pipeline for a specific project in Jenkinsfile](./images/jenkins-shared-project.gif)
